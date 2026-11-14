@@ -1,4 +1,4 @@
-
+import { verifyToken } from "./middleware/verifyToken.js";
 import { MongoClient, ObjectId } from 'mongodb';
 import express from 'express'
 // const cors = require("cors");
@@ -59,7 +59,7 @@ app.get("/books", async (req, res) => {
 });
 
 // Add a new book
-app.post("/books", async (req, res) => {
+app.post("/books", verifyToken, async (req, res) => {
     try {
         const newBook = {
             ...req.body,
@@ -83,7 +83,7 @@ app.post("/books", async (req, res) => {
 });
 
 // Get a single book
-app.get("/books/:id", async (req, res) => {
+app.get("/books/:id", verifyToken, async (req, res) => {
     try {
         const id = req.params.id;
 
@@ -116,7 +116,7 @@ app.get("/books/:id", async (req, res) => {
 });
 
 // Update a book
-app.patch("/books/:id", async (req, res) => {
+app.patch("/books/:id", verifyToken, async (req, res) => {
     try {
         const id = req.params.id;
 
@@ -152,7 +152,7 @@ app.patch("/books/:id", async (req, res) => {
 });
 
 // Delete a book
-app.delete("/books/:id", async (req, res) => {
+app.delete("/books/:id", verifyToken, async (req, res) => {
     try {
         const id = req.params.id;
 
@@ -175,7 +175,7 @@ app.delete("/books/:id", async (req, res) => {
 });
 
 // Borrow a book
-app.post("/borrows", async (req, res) => {
+app.post("/borrows", verifyToken, async (req, res) => {
     try {
         const { bookId, userEmail } = req.body;
 
@@ -236,7 +236,7 @@ app.post("/borrows", async (req, res) => {
 });
 
 // Get all borrow records
-app.get("/borrows", async (req, res) => {
+app.get("/borrows", verifyToken, async (req, res) => {
     try {
         const borrows = await borrowsCollection.find().toArray();
 
