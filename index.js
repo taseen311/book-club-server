@@ -58,11 +58,30 @@ app.get("/books", async (req, res) => {
     }
 });
 
+// Get books added by the logged-in user
+app.get("/my-books", verifyToken, async (req, res) => {
+    try {
+        const books = await booksCollection
+            .find({ userEmail: req.user.email })
+            .toArray();
+
+        res.send(books);
+
+    } catch (error) {
+        console.error("Error fetching my books:", error);
+
+        res.status(500).send({
+            message: "Failed to fetch your books"
+        });
+    }
+});
+
 // Add a new book
 app.post("/books", verifyToken, async (req, res) => {
     try {
         const newBook = {
             ...req.body,
+            userEmail: req.user.email,
             addedDate: new Date()
         };
 
@@ -120,7 +139,10 @@ app.patch("/books/:id", verifyToken, async (req, res) => {
     try {
         const id = req.params.id;
 
-        const filter = { _id: new ObjectId(id) };
+        const filter = {
+            _id: new ObjectId(id),
+            userEmail: req.user.email
+        };
 
         if (!ObjectId.isValid(id)) {
             return res.status(400).send({
@@ -156,7 +178,10 @@ app.delete("/books/:id", verifyToken, async (req, res) => {
     try {
         const id = req.params.id;
 
-        const query = { _id: new ObjectId(id) };
+        const query = {
+            _id: new ObjectId(id),
+            userEmail: req.user.email
+        };
 
         const result = await booksCollection.deleteOne(query);
 
