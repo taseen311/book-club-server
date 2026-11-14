@@ -34,7 +34,10 @@ export async function connectToMongoDB() {
     }
 }
 
-connectToMongoDB();
+// connectToMongoDB();
+connectToMongoDB().then(() => {
+    console.log("Books Collection:", booksCollection);
+});
 
 // Get all books
 app.get("/books", async (req, res) => {
@@ -307,6 +310,8 @@ app.delete("/borrows/:id", async (req, res) => {
 app.get("/", (req, res) => {
     res.send("BookNook Server is Running!");
 });
+
+console.log("Books Collection:", booksCollection);
 
 // Start Server
 app.listen(PORT, () => {
