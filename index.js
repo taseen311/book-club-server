@@ -177,8 +177,8 @@ app.delete("/books/:id", verifyToken, async (req, res) => {
 // Borrow a book
 app.post("/borrows", verifyToken, async (req, res) => {
     try {
-        const { bookId, userEmail } = req.body;
-
+        const { bookId } = req.body;
+        const userEmail = req.user.email;
         const book = await booksCollection.findOne({
             _id: new ObjectId(bookId)
         });
@@ -238,7 +238,7 @@ app.post("/borrows", verifyToken, async (req, res) => {
 // Get all borrow records
 app.get("/borrows", verifyToken, async (req, res) => {
     try {
-        const borrows = await borrowsCollection.find().toArray();
+        const borrows = await borrowsCollection.find({ userEmail: req.user.email }).toArray();
 
         res.send(borrows);
 
@@ -252,13 +252,14 @@ app.get("/borrows", verifyToken, async (req, res) => {
 });
 
 // Return a book
-app.delete("/borrows/:id", async (req, res) => {
+app.delete("/borrows/:id", verifyToken, async (req, res) => {
     try {
         const id = req.params.id;
 
         // Find the borrow record
         const borrow = await borrowsCollection.findOne({
-            _id: new ObjectId(id)
+            _id: new ObjectId(id),
+            userEmail: req.user.email
         });
 
         if (!borrow) {
